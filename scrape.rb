@@ -27,7 +27,19 @@ loop do
   break if jsn["nbPages"] <= page
 
   jsn["hits"].each do |e|
-    posts[e["objectID"]] = { title: e["title"], text: e["story_text"] }
+    # posts[e["objectID"]] = { title: e["title"], text: e["story_text"] }
+    filename = "posts/#{e["objectID"]}.md"
+    if !File.exist? filename
+      if e["title"] && e["story_text"]
+        text = <<-EOT
+# #{e["title"]}
+
+#{e["story_text"]}
+        EOT
+
+        File.open(filename, "w") {|f| f.write text }
+      end
+    end
   end
 
   page += 1
