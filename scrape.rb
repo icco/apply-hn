@@ -13,16 +13,23 @@ posts = {}
 page = 0
 loop do
   # https://hn.algolia.com/api/v1/search_by_date?query=%22apply%20hn%22
-  p page
   params = {
     query: "apply hn",
     hitsPerPage: 50,
     page: page,
+    tags: "story",
+    numericFilters: "created_at_i>=#{Chronic.parse("2016-04-06T18:19:31.000").to_i}",
   }
+  p params
   request = Typhoeus::Request.new("https://hn.algolia.com/api/v1/search_by_date", method: :get, params: params, headers: {})
 
   resp = request.run
   jsn = JSON.parse resp.response_body
+
+  if jsn["error"]
+    p jsn
+    exit
+  end
 
   break if jsn["nbPages"] <= page
 
